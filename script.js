@@ -23,9 +23,9 @@ const REASONS = [
 ];
 
 const MOMENTS = [
-  "The first time I knew",
   "That afternoon we lost track of time",
   "Somewhere we'll go together",
+  "A random (not so random) picture",
 ];
 
 /* ----------------------------------------------------------------
@@ -76,15 +76,27 @@ function Flourish() {
 }
 
 /* ---- a framed botanical plate placeholder ---- */
-function Plate({ id, label, ratio = "3 / 4", className = "" }) {
+/* Pass src to show a real photo (served from /photos), or video to
+   show a silent auto-playing loop (served from /videos); otherwise
+   it stays a drop-a-photo slot. Videos must stay muted — browsers
+   refuse to autoplay them with sound. */
+function Plate({ id, label, ratio = "3 / 4", className = "", src, video, position = "center" }) {
   return (
     <figure className={"plate " + className} style={{ aspectRatio: ratio }}>
       <span className="plate-corner tl"></span>
       <span className="plate-corner tr"></span>
       <span className="plate-corner bl"></span>
       <span className="plate-corner br"></span>
-      <image-slot id={id} placeholder={label} shape="rect" fit="cover"
-        style={{ width: "100%", height: "100%" }}></image-slot>
+      {video ? (
+        <video src={video} autoPlay loop muted playsInline
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: position, display: "block" }} />
+      ) : src ? (
+        <img src={src} alt={label}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: position, display: "block" }} />
+      ) : (
+        <image-slot id={id} placeholder={label} shape="rect" fit="cover"
+          style={{ width: "100%", height: "100%" }}></image-slot>
+      )}
     </figure>
   );
 }
@@ -155,7 +167,7 @@ function Story() {
           <p className="sig-line">{SIGN}</p>
         </div>
         <div className="story-media">
-          <Plate id="story-photo" label="a photo of us" ratio="4 / 5" />
+          <Plate id="story-photo" label="a photo of us" ratio="4 / 5" video="/videos/video-of-us.mp4" />
         </div>
       </div>
     </section>
@@ -217,15 +229,15 @@ function Gallery() {
         </div>
         <div className="gallery-grid">
           <div className="g-item tall">
-            <Plate id="mem-1" label="drop a photo" ratio="3 / 4" />
+            <Plate id="mem-1" label="drop a photo" ratio="3 / 4" src="/photos/afternoon.jpg" />
             <figcaption className="cap">{MOMENTS[0]}</figcaption>
           </div>
           <div className="g-item">
-            <Plate id="mem-2" label="drop a photo" ratio="1 / 1" />
+            <Plate id="mem-2" label="drop a photo" ratio="1 / 1" src="/photos/amalfi-coast.jpg" position="bottom" />
             <figcaption className="cap">{MOMENTS[1]}</figcaption>
           </div>
           <div className="g-item">
-            <Plate id="mem-3" label="drop a photo" ratio="4 / 3" />
+            <Plate id="mem-3" label="drop a photo" ratio="4 / 3" src="/photos/random.jpg" />
             <figcaption className="cap">{MOMENTS[2]}</figcaption>
           </div>
         </div>
