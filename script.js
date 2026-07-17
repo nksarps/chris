@@ -18,7 +18,7 @@ const REASONS = [
   { t: "Your heart", b: "You have a good heart and it shows in everything you do." },
   { t: "Your beauty", b: "It just takes me out. A snap from you makes my day better instantly. Every. Single. Time. To put it elegantly, you're pulchritudinous." },
   { t: "Your sense of humor", b: "I'll leave it at that 😂" },
-  { t: "Your standards and personality", b: "" },
+  { t: "Your standards and personality", b: "Your standards say a lot, but your personality says even more." },
   { t: "Simply you", b: "Just who you are altogether." },
 ];
 
