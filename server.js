@@ -27,6 +27,10 @@ app.use(cors());
 app.use(express.json({ limit: "20kb" })); // answers are small; reject huge bodies
 app.use(express.static(__dirname)); // serves index.html and script.js
 
+// Some browsers/crawlers request this regardless of the <link rel="icon">
+// in index.html, so make sure it resolves too instead of 404ing.
+app.get("/favicon.ico", (req, res) => res.sendFile(path.join(__dirname, "emoji", "2764-fe0f.png")));
+
 // ---------------------------------------------------------------------------
 // Mail transport (SMTP via Nodemailer)
 // ---------------------------------------------------------------------------

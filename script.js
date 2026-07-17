@@ -39,6 +39,9 @@ const APPLE_EMOJI = {
   "🙂‍↕️": "1f642-200d-2195-fe0f.png",
   "❤️": "2764-fe0f.png",
   "🌸": "1f338.png",
+  "🥂": "1f942.png",
+  "🎶": "1f3b6.png",
+  "💕": "1f495.png",
 };
 const EMOJI_SPLIT = new RegExp("(" + Object.keys(APPLE_EMOJI).join("|") + ")", "g");
 
@@ -164,10 +167,10 @@ function Story() {
               "is that the feeling was mutual. It felt almost natural."
             )}
           </p>
-          <p className="sig-line">{SIGN}</p>
         </div>
         <div className="story-media">
-          <Plate id="story-photo" label="a photo of us" ratio="4 / 5" video="/videos/video-of-us.mp4" />
+          <Plate id="story-photo" label="a photo of us" ratio="848 / 480" video="/videos/video-of-us.mp4" />
+          <figcaption className="cap">{emojify("Our first date. First of many🥂")}</figcaption>
         </div>
       </div>
     </section>
@@ -195,7 +198,7 @@ function Reasons() {
       <div className="wrap">
         <div className="centered">
           <p className="eyebrow">A few of the reasons</p>
-          <h2 className="h2">A few reasons<br />why I stayed.</h2>
+          <h2 className="h2">A few reasons<br />why I admire you.</h2>
           <Flourish />
         </div>
         <div className="reason-grid heart">
@@ -339,6 +342,9 @@ function BigQuestion() {
                 No rush, no perfect words required. Just tell me what's in your heart —
                 I'll be right here, reading it.
               </p>
+              <p className="ask-sub" style={{ fontStyle: "italic" }}>
+                {emojify("🎶 Now playing: Can't Take My Eyes off You by Frankie Valli 💕")}
+              </p>
               <div className="reply">
                 <textarea
                   id="reply-input"
@@ -401,6 +407,17 @@ function BigQuestion() {
      above the heart and reveals its body text (see Reasons). */
 const RESPONSIVE_CSS = `
   .plate { margin: 0; }
+
+  /* the story video's caption sits outside .gallery, so it misses the
+     .g-item .cap styling (centered, italic display serif) — match it here */
+  .story-media .cap {
+    margin-top: 1rem;
+    text-align: center;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 1.18rem;
+    color: var(--ink-soft);
+  }
 
   .reason-grid.heart {
     display: block;
