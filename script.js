@@ -187,6 +187,9 @@ const HEART_POS = [
 ];
 
 function Reasons() {
+  /* On small screens the cards show only number + title; tapping one
+     opens its body text (styled by the max-width: 619px overrides). */
+  const [open, setOpen] = useState(null);
   return (
     <section className="section reasons" id="reasons">
       <div className="wrap">
@@ -204,9 +207,10 @@ function Reasons() {
           </svg>
           {REASONS.map((r, i) => (
             <article
-              className="reason-card"
+              className={"reason-card" + (open === i ? " open" : "")}
               key={i}
               style={{ "--hx": HEART_POS[i].x, "--hy": HEART_POS[i].y }}
+              onClick={() => setOpen(open === i ? null : i)}
             >
               <span className="reason-num">{String(i + 1).padStart(2, "0")}</span>
               <h3 className="reason-title">{r.t}</h3>
@@ -247,7 +251,8 @@ function Gallery() {
 }
 
 function BigQuestion() {
-  const KEY = "awurama_reply_v1";
+  /* The thank-you screen only lasts for the visit — every fresh page
+     load starts back at the text field, so she can always write. */
   const [reply, setReply] = useState("");
   const [saved, setSaved] = useState(null);
 
@@ -255,13 +260,6 @@ function BigQuestion() {
      "Sending…"; status carries the success / error message. */
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState(null); // { ok: boolean, msg: string }
-
-  useEffect(() => {
-    try {
-      const v = localStorage.getItem(KEY);
-      if (v) setSaved(JSON.parse(v));
-    } catch (e) {}
-  }, []);
 
   async function send() {
     const text = reply.trim();
@@ -282,9 +280,7 @@ function BigQuestion() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "The answer could not be sent.");
 
-      const entry = { text, at: new Date().toISOString() };
-      try { localStorage.setItem(KEY, JSON.stringify(entry)); } catch (e) {}
-      setSaved(entry);
+      setSaved({ text, at: new Date().toISOString() });
       setStatus({ ok: true, msg: "Thank you ❤️. Your answer has been sent." });
     } catch (err) {
       setStatus({
@@ -299,7 +295,6 @@ function BigQuestion() {
   }
 
   function reset() {
-    try { localStorage.removeItem(KEY); } catch (e) {}
     setSaved(null);
     setReply("");
     setStatus(null);
@@ -394,9 +389,86 @@ function BigQuestion() {
   );
 }
 
+/* Responsive fixes layered on top of the page's own CSS (index.html
+   is the untouched design, so overrides live here instead):
+   - figure keeps a 1em/40px browser default margin the design never
+     resets; it shoved every plate right, causing horizontal scroll on
+     phones and clipping the story photo on tablets.
+   - the design only traces the reasons into a heart at ≥1100px and
+     falls back to a plain grid below; these overrides keep the heart
+     at every width. Type scales down with the viewport, and under
+     620px the cards hold just number + title — tapping one lifts it
+     above the heart and reveals its body text (see Reasons). */
+const RESPONSIVE_CSS = `
+  .plate { margin: 0; }
+
+  .reason-grid.heart {
+    display: block;
+    position: relative;
+    max-width: 1080px;
+    margin: 0 auto;
+    aspect-ratio: 20 / 21;
+    background: none;
+    border: none;
+  }
+  .reason-grid.heart .heart-outline {
+    display: block;
+    position: absolute;
+    left: 10%;
+    top: 8%;
+    width: 80%;
+    height: 86%;
+    color: var(--teal);
+    opacity: 0.35;
+  }
+  .reason-grid.heart .reason-card {
+    position: absolute;
+    left: var(--hx);
+    top: var(--hy);
+    transform: translate(-50%, -50%);
+    width: min(250px, 24%);
+    padding: 26px 22px;
+    text-align: center;
+    border: 1px solid var(--paper-edge);
+    box-shadow: 0 24px 44px -32px oklch(0.4 0.05 240 / 0.5);
+  }
+  .reason-grid.heart .reason-title { font-size: 1.35rem; }
+  .reason-grid.heart .reason-body { font-size: 0.9rem; line-height: 1.6; }
+
+  @media (max-width: 1099px) {
+    .reason-grid.heart .reason-card {
+      width: min(250px, 26%);
+      padding: clamp(10px, 2vw, 22px) clamp(8px, 1.6vw, 18px);
+    }
+    .reason-grid.heart .reason-num { font-size: clamp(0.6rem, 1.4vw, 1.05rem); }
+    .reason-grid.heart .reason-title {
+      font-size: clamp(0.78rem, 2vw, 1.35rem);
+      margin: 0.3rem 0 0.4rem;
+    }
+    .reason-grid.heart .reason-body {
+      font-size: clamp(0.66rem, 1.5vw, 0.9rem);
+      line-height: 1.45;
+    }
+  }
+
+  @media (max-width: 619px) {
+    .reason-grid.heart .reason-card { width: 30%; cursor: pointer; }
+    .reason-grid.heart .reason-body { display: none; }
+    .reason-grid.heart .reason-card.open {
+      width: 64%;
+      z-index: 6;
+      /* keep the widened card inside the heart container even when
+         its anchor sits near an edge (e.g. the side cards at 13.5%/86.5%) */
+      left: clamp(32%, var(--hx), 68%);
+    }
+    .reason-grid.heart .reason-card.open .reason-body { display: block; }
+  }
+`;
+
 function App() {
   return (
     <React.Fragment>
+      <style>{RESPONSIVE_CSS}</style>
       <Hero />
       <Story />
       <Reasons />
