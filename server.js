@@ -115,17 +115,24 @@ app.post("/api/answer", async (req, res) => {
 // ---------------------------------------------------------------------------
 // Start
 // ---------------------------------------------------------------------------
-app.listen(PORT, () => {
-  console.log(`Proposal site running at http://localhost:${PORT}`);
+// Vercel imports `app` and handles requests itself (serverless — no open
+// socket), so only bind a port when this file is actually run directly,
+// e.g. `node server.js` locally or on Render.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Proposal site running at http://localhost:${PORT}`);
 
-  // Check the SMTP credentials up front so problems show immediately,
-  // not at the moment she clicks "Send it to me".
-  transporter.verify((err) => {
-    if (err) {
-      console.warn("⚠ SMTP check failed — emails will not send until this is fixed:");
-      console.warn("  " + err.message);
-    } else {
-      console.log("✓ SMTP connection verified — emails will send.");
-    }
+    // Check the SMTP credentials up front so problems show immediately,
+    // not at the moment she clicks "Send it to me".
+    transporter.verify((err) => {
+      if (err) {
+        console.warn("⚠ SMTP check failed — emails will not send until this is fixed:");
+        console.warn("  " + err.message);
+      } else {
+        console.log("✓ SMTP connection verified — emails will send.");
+      }
+    });
   });
-});
+}
+
+module.exports = app;
